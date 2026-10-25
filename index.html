@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ciao Irena 🥔</title>
+<meta property="og:title" content="Ciao Irena 🥔">
+<meta property="og:description" content="hai un messaggio da Jacki">
+<meta property="og:image" content="https://worldwidejack.github.io/ciao-irena/sprites/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #7f9cf0;
+    --ink: #1b2a6b;
+    --title: #1d3fc4;
+    --cream: #fbf5ea;
+    --win: #c3c3c3;
+    --win-light: #ffffff;
+    --win-dark: #7b7b7b;
+    --win-black: #1a1a1a;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--sky) url("sprites/cielo.jpg") center / cover no-repeat;
+    color: var(--ink);
+    font-family: "Jersey 10", ui-monospace, monospace;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 26px; padding: 24px 16px 40px;
+    text-align: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  .screen.on { opacity: 1; pointer-events: auto; }
+
+  /* testo sul cielo: contorno crema a scalini, leggibile su ogni nuvola */
+  .sky-text {
+    text-shadow:
+      3px 0 var(--cream), -3px 0 var(--cream), 0 3px var(--cream), 0 -3px var(--cream),
+      3px 3px var(--cream), -3px 3px var(--cream), 3px -3px var(--cream), -3px -3px var(--cream),
+      0 7px rgba(27, 42, 107, .25);
+  }
+  h1 {
+    font-size: clamp(60px, 19vw, 96px); font-weight: 400; line-height: .9;
+    margin: 0; color: var(--title); white-space: nowrap;
+  }
+  h1 .emoji { font-size: .62em; vertical-align: .12em; }
+  .say {
+    font-size: clamp(40px, 11.5vw, 54px); line-height: 1;
+    margin: 0; max-width: 360px; min-height: 1em; color: var(--ink);
+  }
+  .say .caret { animation: blink .7s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* sprite di Jacki: piccolo, a pixel interi */
+  .jack {
+    width: 96px; height: 120px;
+    background: center bottom / contain no-repeat;
+  }
+  .jack.hop { animation: hop .38s steps(3) infinite alternate; }
+  @keyframes hop { to { transform: translateY(-14px); } }
+  .jack.bob { animation: bob 1.2s steps(1) infinite; }
+  @keyframes bob { 50% { transform: translateY(-3px); } }
+
+  /* bottone Windows 98 */
+  .btn {
+    font-family: "VT323", ui-monospace, monospace; font-size: 30px; line-height: 1;
+    color: var(--win-black);
+    background: var(--win);
+    border: 0;
+    padding: 12px 28px 14px;
+    min-width: 150px;
+    box-shadow:
+      inset -3px -3px var(--win-black), inset 3px 3px var(--win-light),
+      inset -6px -6px var(--win-dark), inset 6px 6px #dfdfdf;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .btn:active, .btn.picked {
+    box-shadow:
+      inset 3px 3px var(--win-black), inset -3px -3px var(--win-light),
+      inset 6px 6px var(--win-dark), inset -6px -6px #dfdfdf;
+    padding: 14px 26px 12px 30px;
+  }
+  .btn.picked { background: #b9c6f3; }
+  .btn:disabled { color: var(--win-dark); text-shadow: 1px 1px var(--win-light); cursor: default; }
+  .btn:disabled:active {
+    box-shadow:
+      inset -3px -3px var(--win-black), inset 3px 3px var(--win-light),
+      inset -6px -6px var(--win-dark), inset 6px 6px #dfdfdf;
+    padding: 12px 28px 14px;
+  }
+  a.btn { text-decoration: none; display: inline-block; }
+
+  .row { display: flex; gap: 14px; justify-content: center; }
+  .col { display: flex; flex-direction: column; gap: 14px; width: min(290px, 100%); }
+
+  /* pezzi che compaiono dopo la scritta */
+  .later { opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; pointer-events: none; }
+  .later.shown { opacity: 1; transform: none; pointer-events: auto; }
+
+  #no.loose { position: fixed; z-index: 5; transition: left .18s ease-out, top .18s ease-out; }
+
+  /* campo data incassato, sempre Windows 98 */
+  .field {
+    background: #fff; width: min(290px, 100%); padding: 6px 10px;
+    box-shadow: inset 3px 3px var(--win-dark), inset -3px -3px var(--win-light),
+                inset 6px 6px var(--win-black), inset -6px -6px #dfdfdf;
+  }
+  input[type="date"] {
+    font-family: "VT323", ui-monospace, monospace; font-size: 30px; color: var(--win-black);
+    width: 100%; min-height: 44px; border: 0; background: transparent; text-align: center;
+  }
+
+  .summary { font-size: 38px; line-height: 1.05; color: var(--ink); }
+
+  /* Amsterdam solo nella seconda schermata */
+  .skyline {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 17vh;
+    background: url("sprites/skyline.png") 12% bottom / auto 100% no-repeat;
+    pointer-events: none;
+  }
+  #s-domanda { padding-bottom: calc(17vh + 10px); }
+  #s-domanda .say { min-height: 3em; }
+  .row.fill { width: 100%; }
+  .row.fill .btn { flex: 1; min-width: 0; padding-left: 8px; padding-right: 8px; }
+
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+</style>
+</head>
+<body>
+
+<!-- 1. saluto -->
+<section class="screen on" id="s-ciao">
+  <div class="jack" id="jack-ciao"></div>
+  <h1 class="sky-text">Ciao Irena <span class="emoji">🥔</span></h1>
+  <button class="btn" id="ciao">ciao jacki</button>
+</section>
+
+<!-- 2. la domanda -->
+<section class="screen" id="s-domanda">
+  <div class="skyline"></div>
+  <div class="jack bob" id="jack-domanda"></div>
+  <p class="say sky-text" data-say="prima di andare ad Amsterdam ci vediamo? 👉👈"></p>
+  <div class="row later">
+    <button class="btn" id="si">sì</button>
+    <button class="btn" id="no">no</button>
+  </div>
+</section>
+
+<!-- 3. cosa -->
+<section class="screen" id="s-cosa">
+  <div class="jack bob" data-pose="idle"></div>
+  <p class="say sky-text" data-say="cosa facciamo?"></p>
+  <div class="col later">
+    <button class="btn" data-cosa="caffè ☕">☕ caffè</button>
+    <button class="btn" data-cosa="birra/spritz 🍻">🍻 birra/spritz</button>
+    <button class="btn" data-cosa="cena 🍝">🍝 cena</button>
+  </div>
+</section>
+
+<!-- 4. quando -->
+<section class="screen" id="s-quando">
+  <div class="jack bob" data-pose="idle"></div>
+  <p class="say sky-text" data-say="quando?"></p>
+  <div class="col later" style="align-items:center">
+    <div class="field"><input type="date" id="data" aria-label="giorno"></div>
+    <div class="row fill">
+      <button class="btn" data-fascia="pomeriggio">pomeriggio</button>
+      <button class="btn" data-fascia="sera">sera</button>
+    </div>
+    <button class="btn" id="avanti" disabled>avanti →</button>
+  </div>
+</section>
+
+<!-- 5. fine -->
+<section class="screen" id="s-fine">
+  <div class="jack" id="jack-fine"></div>
+  <p class="say sky-text" data-say="segnato! 🥳"></p>
+  <div class="col later" style="align-items:center">
+    <div class="summary sky-text" id="summary"></div>
+    <a class="btn" id="manda" target="_blank" rel="noopener">mandalo a Jacki 💌</a>
+  </div>
+</section>
+
+<canvas id="confetti"></canvas>
+
+<script>
+  // numero di Jack in formato internazionale senza "+" (es. "393331234567"); vuoto = WhatsApp chiede a chi mandarlo
+  const PHONE = "393518357709";
+  // ultimo giorno prima della partenza (es. "2026-11-20"); vuoto = nessun limite
+  const DEPARTURE = "";
+
+  const choice = { cosa: "", data: "", fascia: "" };
+
+  // --- sprite: una posa o una sequenza di pose con i tempi
+  ["idle", "saluto-a", "saluto-b", "salto"].forEach(p => { new Image().src = `sprites/${p}.png`; });
+  function pose(el, name) {
+    clearTimeout(el._t);
+    el.style.backgroundImage = `url("sprites/${name}.png")`;
+  }
+  function loop(el, steps) {
+    let i = 0;
+    clearTimeout(el._t);
+    (function next() {
+      const [name, ms] = steps[i];
+      el.style.backgroundImage = `url("sprites/${name}.png")`;
+      i = (i + 1) % steps.length;
+      el._t = setTimeout(next, ms);
+    })();
+  }
+  const WAVE = [["saluto-a", 260], ["saluto-b", 260], ["saluto-a", 260], ["saluto-b", 260], ["idle", 1400]];
+  document.querySelectorAll("[data-pose]").forEach(el => pose(el, el.dataset.pose));
+  loop(document.getElementById("jack-ciao"), WAVE);
+  pose(document.getElementById("jack-domanda"), "idle");
+
+  // --- scritta a macchina da scrivere, poi compaiono i bottoni
+  function typewrite(el) {
+    const chars = Array.from(el.dataset.say);
+    el.innerHTML = '<span class="txt"></span><span class="caret">▌</span>';
+    const txt = el.querySelector(".txt");
+    let i = 0;
+    return new Promise(done => {
+      (function tick() {
+        txt.textContent = chars.slice(0, ++i).join("");
+        if (i < chars.length) setTimeout(tick, chars[i - 1] === " " ? 40 : 55 + Math.random() * 45);
+        else { setTimeout(() => el.querySelector(".caret")?.remove(), 600); done(); }
+      })();
+    });
+  }
+
+  function go(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+    const screen = document.getElementById(id);
+    const say = screen.querySelector("[data-say]");
+    screen.querySelectorAll(".later").forEach(l => l.classList.remove("shown"));
+    if (say) setTimeout(() => typewrite(say).then(() =>
+      screen.querySelectorAll(".later").forEach(l => l.classList.add("shown"))), 250);
+  }
+
+  document.getElementById("ciao").addEventListener("click", () => go("s-domanda"));
+
+  // --- sì
+  document.getElementById("si").addEventListener("click", () => {
+    resetNo();
+    const j = document.getElementById("jack-domanda");
+    j.classList.remove("bob");
+    j.classList.add("hop");
+    pose(j, "salto");
+    confetti();
+    setTimeout(() => go("s-cosa"), 1100);
+  });
+
+  // --- no: scappa prima che il dito arrivi
+  const no = document.getElementById("no");
+  function escape(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    if (!no.classList.contains("loose") && !no.closest(".later").classList.contains("shown")) return;
+    const r = no.getBoundingClientRect();
+    if (!no.classList.contains("loose")) {
+      // segnaposto invisibile, così sì resta dove è
+      const ghost = no.cloneNode(true);
+      ghost.id = "no-ghost";
+      ghost.style.visibility = "hidden";
+      no.after(ghost);
+      no.style.left = r.left + "px";
+      no.style.top = r.top + "px";
+      no.classList.add("loose");
+      no.offsetWidth; // fissa la posizione di partenza prima di animare
+    }
+    const pad = 16;
+    const maxX = innerWidth - r.width - pad, maxY = innerHeight - r.height - pad;
+    let x, y, tries = 0;
+    do {
+      x = pad + Math.random() * (maxX - pad);
+      y = pad + Math.random() * (maxY - pad);
+      tries++;
+    } while (tries < 20 && Math.hypot(x - r.left, y - r.top) < 140);
+    no.style.left = x + "px";
+    no.style.top = y + "px";
+  }
+  function resetNo() {
+    document.getElementById("no-ghost")?.remove();
+    no.classList.remove("loose");
+    no.style.left = no.style.top = "";
+  }
+  ["pointerenter", "pointerdown", "touchstart", "click", "focus"].forEach(ev =>
+    no.addEventListener(ev, escape, { passive: false }));
+
+  // --- cosa
+  document.querySelectorAll("[data-cosa]").forEach(b => b.addEventListener("click", () => {
+    choice.cosa = b.dataset.cosa;
+    b.classList.add("picked");
+    setTimeout(() => go("s-quando"), 350);
+  }));
+
+  // --- quando
+  const data = document.getElementById("data");
+  const today = new Date();
+  data.min = today.toISOString().slice(0, 10);
+  if (DEPARTURE) data.max = DEPARTURE;
+  const avanti = document.getElementById("avanti");
+  const ready = () => { avanti.disabled = !(choice.data && choice.fascia); };
+  data.addEventListener("change", () => { choice.data = data.value; ready(); });
+  document.querySelectorAll("[data-fascia]").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-fascia]").forEach(x => x.classList.toggle("picked", x === b));
+    choice.fascia = b.dataset.fascia;
+    ready();
+  }));
+
+  function prettyDate(iso) {
+    const d = new Date(iso + "T12:00:00");
+    return d.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+  }
+
+  avanti.addEventListener("click", () => {
+    const quando = `${prettyDate(choice.data)}, ${choice.fascia}`;
+    document.getElementById("summary").innerHTML = `${choice.cosa}<br>📅 ${quando}`;
+    const text = `sì! 🥳 ${choice.cosa}, ${quando}`;
+    document.getElementById("manda").href =
+      `https://wa.me/${PHONE}?text=${encodeURIComponent(text)}`;
+    const jf = document.getElementById("jack-fine");
+    jf.classList.add("hop");
+    pose(jf, "salto");
+    go("s-fine");
+    confetti();
+  });
+
+  // --- coriandoli quadrati, in tema pixel
+  function confetti() {
+    const c = document.getElementById("confetti");
+    const ctx = c.getContext("2d");
+    c.width = innerWidth; c.height = innerHeight;
+    const colors = ["#ff8fb1", "#ffd27f", "#fbf5ea", "#1d3fc4", "#b9a4ff"];
+    const bits = Array.from({ length: 120 }, () => ({
+      x: innerWidth / 2 + (Math.random() - .5) * 60,
+      y: innerHeight * .45,
+      vx: (Math.random() - .5) * 14,
+      vy: -Math.random() * 14 - 4,
+      s: 6 + Math.random() * 6,
+      c: colors[Math.floor(Math.random() * colors.length)],
+    }));
+    let frame = 0;
+    (function tick() {
+      ctx.clearRect(0, 0, c.width, c.height);
+      bits.forEach(b => {
+        b.vy += .45; b.x += b.vx; b.y += b.vy; b.vx *= .99;
+        ctx.fillStyle = b.c;
+        ctx.fillRect(Math.round(b.x), Math.round(b.y), b.s, b.s);
+      });
+      if (++frame < 140) requestAnimationFrame(tick);
+      else ctx.clearRect(0, 0, c.width, c.height);
+    })();
+  }
+</script>
+</body>
+</html>
