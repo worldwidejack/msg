@@ -138,7 +138,7 @@
   /* PC: cielo orizzontale, tutto un po' più grande, casette fino ai bordi */
   @media (min-aspect-ratio: 1/1) {
     body { background-image: url("sprites/cielo-largo.jpg"); }
-    .skyline { background-repeat: repeat-x; }
+    .skyline { background-repeat: repeat-x; background-position: center bottom; }
   }
   @media (min-width: 900px) and (min-height: 700px) {
     .screen { gap: 34px; }
@@ -150,6 +150,9 @@
     .col, .field { width: 360px; }
     .summary { font-size: 46px; }
   }
+
+  /* emoji a colori anche dentro i font pixel, che hanno il loro ☕ in bianco e nero */
+  .emo { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; text-shadow: none; }
 
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 </style>
@@ -179,9 +182,9 @@
   <div class="jack bob" data-pose="idle"></div>
   <p class="say sky-text" data-say="cosa facciamo?"></p>
   <div class="col later">
-    <button class="btn" data-cosa="caffè ☕">☕ caffè</button>
-    <button class="btn" data-cosa="birra/spritz 🍻">🍻 birra/spritz</button>
-    <button class="btn" data-cosa="cena 🍝">🍝 cena</button>
+    <button class="btn" data-cosa="caffè ☕️"><span class="emo">☕️</span> caffè</button>
+    <button class="btn" data-cosa="birra/spritz 🍻"><span class="emo">🍻</span> birra/spritz</button>
+    <button class="btn" data-cosa="cena 🍝"><span class="emo">🍝</span> cena</button>
   </div>
 </section>
 
@@ -341,7 +344,8 @@
 
   avanti.addEventListener("click", () => {
     const quando = `${prettyDate(choice.data)}, ${choice.fascia}`;
-    document.getElementById("summary").innerHTML = `${choice.cosa}<br>📅 ${quando}`;
+    document.getElementById("summary").innerHTML =
+      `${choice.cosa.replace(/(\S+)$/u, '<span class="emo">$1</span>')}<br><span class="emo">📅</span> ${quando}`;
     const text = `sì! 🥳 ${choice.cosa}, ${quando}`;
     document.getElementById("manda").href =
       `https://wa.me/${PHONE}?text=${encodeURIComponent(text)}`;
