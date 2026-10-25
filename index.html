@@ -135,6 +135,22 @@
   .row.fill { width: 100%; }
   .row.fill .btn { flex: 1; min-width: 0; padding-left: 8px; padding-right: 8px; }
 
+  /* PC: cielo orizzontale, tutto un po' più grande, casette fino ai bordi */
+  @media (min-aspect-ratio: 1/1) {
+    body { background-image: url("sprites/cielo-largo.jpg"); }
+    .skyline { background-repeat: repeat-x; }
+  }
+  @media (min-width: 900px) and (min-height: 700px) {
+    .screen { gap: 34px; }
+    .jack { width: 128px; height: 160px; }
+    h1 { font-size: 120px; }
+    .say { font-size: 64px; max-width: 620px; }
+    .btn, input[type="date"] { font-size: 36px; }
+    .btn { min-width: 190px; }
+    .col, .field { width: 360px; }
+    .summary { font-size: 46px; }
+  }
+
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 </style>
 </head>
@@ -151,7 +167,7 @@
 <section class="screen" id="s-domanda">
   <div class="skyline"></div>
   <div class="jack bob" id="jack-domanda"></div>
-  <p class="say sky-text" data-say="prima di andare ad Amsterdam ci vediamo? 👉👈"></p>
+  <p class="say sky-text" data-say="prima di andare ad Amsterdam ci vediamo?&nbsp;👉&#8288;👈"></p>
   <div class="row later">
     <button class="btn" id="si">sì</button>
     <button class="btn" id="no">no</button>
@@ -189,7 +205,7 @@
   <p class="say sky-text" data-say="segnato! 🥳"></p>
   <div class="col later" style="align-items:center">
     <div class="summary sky-text" id="summary"></div>
-    <a class="btn" id="manda" target="_blank" rel="noopener">mandalo a Jacki 💌</a>
+    <a class="btn" id="manda" target="_blank" rel="noopener">mandalo a Jacki</a>
   </div>
 </section>
 
