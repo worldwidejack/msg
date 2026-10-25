@@ -54,7 +54,8 @@
     font-size: clamp(60px, 19vw, 96px); font-weight: 400; line-height: .9;
     margin: 0; color: var(--title); white-space: nowrap;
   }
-  h1 .emoji { font-size: .62em; vertical-align: .12em; }
+  h1 { min-height: .9em; }
+  h1 .emoji { display: inline-block; font-size: .62em; vertical-align: .12em; margin-left: .25em; }
   .say {
     font-size: clamp(40px, 11.5vw, 54px); line-height: 1;
     margin: 0; max-width: 360px; min-height: 1em; color: var(--ink);
@@ -162,8 +163,8 @@
 <!-- 1. saluto -->
 <section class="screen on" id="s-ciao">
   <div class="jack" id="jack-ciao"></div>
-  <h1 class="sky-text">Ciao Irena <span class="emoji">🥔</span></h1>
-  <button class="btn" id="ciao">ciao jacki</button>
+  <h1 class="sky-text"><span data-say="Ciao Irena"></span><span class="emoji later">🥔</span></h1>
+  <button class="btn later" id="ciao">ciao jacki</button>
 </section>
 
 <!-- 2. la domanda -->
@@ -241,6 +242,8 @@
   const WAVE = [["saluto-a", 260], ["saluto-b", 260], ["saluto-a", 260], ["saluto-b", 260], ["idle", 1400]];
   document.querySelectorAll("[data-pose]").forEach(el => pose(el, el.dataset.pose));
   loop(document.getElementById("jack-ciao"), WAVE);
+  // anche il saluto si scrive a macchina, appena il font pixel è pronto
+  document.fonts.ready.then(() => go("s-ciao"));
   pose(document.getElementById("jack-domanda"), "idle");
 
   // --- scritta a macchina da scrivere, poi compaiono i bottoni
