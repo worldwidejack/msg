@@ -109,6 +109,7 @@
   /* pezzi che compaiono dopo la scritta */
   .later { opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; pointer-events: none; }
   .later.shown { opacity: 1; transform: none; pointer-events: auto; }
+  #ciao.later.shown { transition-delay: .6s; } /* il bottone arriva un attimo dopo la patata */
 
   #no.loose { position: fixed; z-index: 5; transition: left .18s ease-out, top .18s ease-out; }
 
